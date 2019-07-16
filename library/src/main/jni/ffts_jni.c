@@ -186,13 +186,13 @@ JNIEXPORT void JNICALL Java_nz_ac_waikato_ffts_FFTS_execute__JJ_3FI_3FI
     // On oracle jvm this is faster than GetFloatArrayElements()
     void *src, *dst;
 
-    src = xmemalign(64, size * 4);
+    src = xmemalign(64, (*env)->GetArrayLength(env, jsrc) * 4);
     if (!src)
     {
         throwOutOfMemoryError(env, NULL);
         return;
     }
-    dst = xmemalign(64, size * 4);
+    dst = xmemalign(64, (*env)->GetArrayLength(env, jdst) * 4);
     if (!dst)
     {
         free(src);
@@ -200,9 +200,9 @@ JNIEXPORT void JNICALL Java_nz_ac_waikato_ffts_FFTS_execute__JJ_3FI_3FI
         return;
     }
 
-    (*env)->GetFloatArrayRegion(env, jsrc, 0, size, src + soff);
+    (*env)->GetFloatArrayRegion(env, jsrc, 0, (*env)->GetArrayLength(env, jsrc), src + soff);
     ffts_execute(plan, src, dst);
-    (*env)->SetFloatArrayRegion(env, jdst, 0, size, dst + doff);
+    (*env)->SetFloatArrayRegion(env, jdst, 0, (*env)->GetArrayLength(env, jdst), dst + doff);
 
     free(dst);
     free(src);
